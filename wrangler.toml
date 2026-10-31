@@ -1,6 +1,7 @@
 name = "my-photobooth"
 main = "worker/index.js"
 compatibility_date = "2026-10-31"
+keep_vars = true
 
 [assets]
 directory = "./fronted"
