@@ -123,8 +123,61 @@ const adminPin=document.getElementById("adminPin");
 const adminLoginForm=document.getElementById("adminLoginForm");
 const adminLoginBtn=document.getElementById("adminLoginBtn");
 const adminLoginStatus=document.getElementById("adminLoginStatus");
+const adminDashboard=document.getElementById("adminDashboard");
+const adminHistoryBody=document.getElementById("adminHistoryBody");
+const adminHistoryStatus=document.getElementById("adminHistoryStatus");
+let adminSessionToken=null;
 function closeAdminModal(){adminModal.hidden=true;adminLoginStatus.textContent="";adminPin.value="";}
-document.getElementById("adminInfoBtn").addEventListener("click",()=>{adminModal.hidden=false;adminPin.focus();});
+function showAdminDashboard(){
+  adminLoginForm.hidden=true;adminLoginStatus.hidden=true;adminDashboard.hidden=false;
+  document.getElementById("adminModalTitle").textContent="Pengelolaan Photobooth";
+}
+function formatAdminDate(value){
+  if(!value)return "-";
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?String(value):d.toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"});
+}
+function safeText(value){return value===null||value===undefined||value===""?"-":String(value);}
+function appendAdminCell(row,value){
+  const td=document.createElement("td");td.textContent=safeText(value);row.appendChild(td);return td;
+}
+async function loadAdminData(){
+  if(!adminSessionToken)return;
+  adminHistoryStatus.textContent="Memuat riwayat foto...";
+  document.getElementById("adminRefreshBtn").disabled=true;
+  try{
+    const response=await fetch("/api/admin/data",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:adminSessionToken})});
+    const result=await response.json();
+    if(!response.ok||!result.success)throw new Error(result.message||"Gagal mengambil data admin.");
+    const stats=result.stats||{};
+    document.getElementById("adminTotalPhotos").textContent=safeText(stats.totalPhotos??stats.total??result.totalPhotos??0);
+    document.getElementById("adminTodayPhotos").textContent=safeText(stats.todayPhotos??stats.today??result.todayPhotos??0);
+    const records=result.records||result.history||result.data||[];
+    adminHistoryBody.replaceChildren();
+    if(!records.length){adminHistoryStatus.textContent="Belum ada riwayat foto.";return;}
+    records.forEach(item=>{
+      const row=document.createElement("tr");
+      appendAdminCell(row,formatAdminDate(item.tanggalUpload??item.date??item.timestamp??item.uploadDate));
+      appendAdminCell(row,item.namaFile??item.fileName??item.name);
+      appendAdminCell(row,item.modeFoto??item.mode);
+      appendAdminCell(row,item.frame);
+      const linkCell=document.createElement("td");
+      const url=item.linkGoogleDrive??item.fileUrl??item.url;
+      if(url){const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Buka foto ↗";linkCell.appendChild(a);}
+      else linkCell.textContent="-";
+      row.appendChild(linkCell);adminHistoryBody.appendChild(row);
+    });
+    adminHistoryStatus.textContent="Menampilkan "+records.length+" riwayat terbaru.";
+  }catch(error){
+    adminHistoryStatus.textContent=error.message;
+    if(/sesi|token|login|expired/i.test(error.message)){adminSessionToken=null;adminDashboard.hidden=true;adminLoginForm.hidden=false;adminLoginStatus.hidden=false;adminLoginStatus.textContent="Sesi berakhir. Silakan login kembali.";}
+  }finally{document.getElementById("adminRefreshBtn").disabled=false;}
+}
+document.getElementById("adminInfoBtn").addEventListener("click",()=>{
+  adminModal.hidden=false;
+  if(adminSessionToken){showAdminDashboard();loadAdminData();}
+  else{adminLoginForm.hidden=false;adminLoginStatus.hidden=false;adminDashboard.hidden=true;document.getElementById("adminModalTitle").textContent="Admin Login";adminPin.focus();}
+});
 document.getElementById("adminCloseBtn").addEventListener("click",closeAdminModal);
 adminModal.addEventListener("click",event=>{if(event.target===adminModal)closeAdminModal();});
 adminLoginForm.addEventListener("submit",async event=>{
@@ -136,13 +189,17 @@ adminLoginForm.addEventListener("submit",async event=>{
     const response=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin})});
     const result=await response.json();
     if(!response.ok||!result.success)throw new Error(result.message||"Login admin gagal.");
-    adminLoginStatus.textContent="PIN benar. Login berhasil. Area pengelolaan akan dibuka pada tahap berikutnya.";
-    adminLoginStatus.classList.add("is-success");
-    adminPin.value="";
-  }catch(error){
-    adminLoginStatus.textContent=error.message;
-    adminLoginStatus.classList.remove("is-success");
-  }finally{adminLoginBtn.disabled=false;}
+    if(!result.token)throw new Error("Login berhasil, tetapi token sesi tidak diterima. Periksa versi Code.gs dan deployment.");
+    adminSessionToken=result.token;adminPin.value="";adminLoginStatus.textContent="";
+    showAdminDashboard();await loadAdminData();
+  }catch(error){adminLoginStatus.textContent=error.message;adminLoginStatus.classList.remove("is-success");}
+  finally{adminLoginBtn.disabled=false;}
+});
+document.getElementById("adminRefreshBtn").addEventListener("click",loadAdminData);
+document.getElementById("adminLogoutBtn").addEventListener("click",()=>{
+  adminSessionToken=null;adminDashboard.hidden=true;adminLoginForm.hidden=false;adminLoginStatus.hidden=false;
+  adminLoginStatus.textContent="Kamu sudah keluar dari area admin.";adminLoginStatus.classList.remove("is-success");
+  document.getElementById("adminModalTitle").textContent="Admin Login";
 });
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!adminModal.hidden)closeAdminModal();});
 window.addEventListener("beforeunload",()=>{if(stream)stream.getTracks().forEach(track=>track.stop());});
