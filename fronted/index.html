@@ -136,6 +136,19 @@
         <button class="primary-button" id="adminLoginBtn" type="submit">MASUK ADMIN <span>→</span></button>
       </form>
       <p id="adminLoginStatus" class="admin-login-status" role="status"></p>
+      <section id="adminDashboard" class="admin-dashboard" hidden>
+        <div class="admin-dashboard-head">
+          <div><span class="step-label">PANEL PENGELOLA</span><h3>Dashboard Admin</h3><p>Ringkasan dan riwayat foto yang tersimpan.</p></div>
+          <button type="button" id="adminLogoutBtn" class="secondary-button">Keluar</button>
+        </div>
+        <div class="admin-stats">
+          <article class="admin-stat"><small>TOTAL FOTO</small><strong id="adminTotalPhotos">0</strong></article>
+          <article class="admin-stat"><small>DIUNGGAH HARI INI</small><strong id="adminTodayPhotos">0</strong></article>
+        </div>
+        <div class="admin-history-head"><div><b>Riwayat Foto</b><small>Data terbaru yang tersimpan di database.</small></div><button type="button" id="adminRefreshBtn" class="secondary-button">↻ Muat ulang</button></div>
+        <div id="adminHistoryStatus" class="admin-history-status">Memuat data...</div>
+        <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Tanggal</th><th>Nama File</th><th>Mode</th><th>Frame</th><th>Foto</th></tr></thead><tbody id="adminHistoryBody"></tbody></table></div>
+      </section>
     </div>
   </section>
   <footer><span>MY PHOTOBOOTH</span><span>MAKE MEMORIES THAT LAST · 2026</span></footer>
