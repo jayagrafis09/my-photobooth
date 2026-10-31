@@ -1,57 +1,64 @@
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // CORS
     const corsHeaders = {
       "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN || "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders,
+    const jsonResponse = (data, status = 200) =>
+      new Response(JSON.stringify(data), {
+        status,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json; charset=utf-8",
+        },
       });
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    // Health check
     if (url.pathname === "/" && request.method === "GET") {
-      return Response.json({
+      return jsonResponse({
         success: true,
         app: "MY PHOTOBOOTH API",
         status: "active",
-      }, {
-        headers: corsHeaders,
       });
     }
 
-    // Upload endpoint
     if (url.pathname === "/api/upload" && request.method === "POST") {
       try {
-        const body = await request.json();
+        let body;
+
+        try {
+          body = await request.json();
+        } catch (error) {
+          return jsonResponse({
+            success: false,
+            message: "Request dari web Photobooth bukan JSON yang valid.",
+          }, 400);
+        }
 
         if (!body.image) {
-          return Response.json({
+          return jsonResponse({
             success: false,
-            message: "Data foto tidak ditemukan",
-          }, {
-            status: 400,
-            headers: corsHeaders,
-          });
+            message: "Data foto tidak ditemukan.",
+          }, 400);
         }
 
         if (!env.GAS_URL || !env.API_SECRET) {
-          throw new Error("Konfigurasi backend belum lengkap");
+          return jsonResponse({
+            success: false,
+            message: "Konfigurasi GAS_URL atau API_SECRET belum lengkap di Cloudflare.",
+          }, 500);
         }
 
-        const response = await fetch(env.GAS_URL, {
+        const gasResponse = await fetch(env.GAS_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             secret: env.API_SECRET,
             image: body.image,
@@ -60,30 +67,45 @@ export default {
           redirect: "follow",
         });
 
-        const result = await response.json();
+        const responseText = await gasResponse.text();
+        let result;
 
-        return Response.json(result, {
-          status: response.ok ? 200 : 502,
-          headers: corsHeaders,
-        });
+        try {
+          result = JSON.parse(responseText);
+        } catch (error) {
+          const preview = responseText
+            ? responseText.slice(0, 300).replace(/\\s+/g, " ")
+            : "(respons kosong)";
+
+          return jsonResponse({
+            success: false,
+            message:
+              "Google Apps Script tidak mengembalikan JSON yang valid. " +
+              "HTTP " + gasResponse.status + ". Respons: " + preview +
+              " Periksa URL deployment dan akses Web App GAS.",
+          }, 502);
+        }
+
+        if (!gasResponse.ok) {
+          return jsonResponse({
+            success: false,
+            message: result.message || ("Google Apps Script merespons HTTP " + gasResponse.status + "."),
+          }, 502);
+        }
+
+        return jsonResponse(result, 200);
 
       } catch (error) {
-        return Response.json({
+        return jsonResponse({
           success: false,
-          message: error.message || "Upload gagal",
-        }, {
-          status: 500,
-          headers: corsHeaders,
-        });
+          message: error.message || "Terjadi kesalahan pada Cloudflare Worker.",
+        }, 500);
       }
     }
 
-    return Response.json({
+    return jsonResponse({
       success: false,
-      message: "Endpoint tidak ditemukan",
-    }, {
-      status: 404,
-      headers: corsHeaders,
-    });
+      message: "Endpoint tidak ditemukan.",
+    }, 404);
   },
 };
