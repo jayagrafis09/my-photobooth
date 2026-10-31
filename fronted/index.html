@@ -123,6 +123,21 @@
 
     <section class="attendant-note"><span>✦</span><div><b>Butuh bantuan?</b><small>Jika kamera atau proses foto mengalami kendala, silakan hubungi petugas booth.</small></div></section>
   </main>
+
+  <section class="admin-modal" id="adminModal" hidden aria-modal="true" role="dialog" aria-labelledby="adminModalTitle">
+    <div class="admin-dialog">
+      <button class="admin-close" id="adminCloseBtn" type="button" aria-label="Tutup">×</button>
+      <span class="step-label">AREA TERBATAS</span>
+      <h2 id="adminModalTitle">Admin Login</h2>
+      <p class="admin-description">Masukkan PIN untuk masuk ke area pengelola Photobooth.</p>
+      <form id="adminLoginForm">
+        <label for="adminPin">PIN Admin</label>
+        <input id="adminPin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" required maxlength="64" placeholder="Masukkan PIN admin">
+        <button class="primary-button" id="adminLoginBtn" type="submit">MASUK ADMIN <span>→</span></button>
+      </form>
+      <p id="adminLoginStatus" class="admin-login-status" role="status"></p>
+    </div>
+  </section>
   <footer><span>MY PHOTOBOOTH</span><span>MAKE MEMORIES THAT LAST · 2026</span></footer>
   <script src="app.js"></script>
 </body>
