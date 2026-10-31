@@ -1,87 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#171717">
-  <title>MY PHOTOBOOTH</title>
+  <meta name="theme-color" content="#fbf9f6">
+  <title>My Photobooth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-
-<header class="header">
-  <h1>MY PHOTOBOOTH</h1>
-  <p>Capture your best moments</p>
-</header>
-
-<main class="container">
-  <section class="panel">
-
-    <label for="mode">Pilih Mode Photobooth</label>
-    <select id="mode">
-      <option value="1">Single Photo</option>
-      <option value="3">Photo Strip 3</option>
-      <option value="4">Photo Strip 4</option>
-    </select>
-
-    <div class="camera-box">
-      <video id="video" autoplay muted playsinline></video>
-      <div id="cameraPlaceholder">Kamera belum aktif</div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="My Photobooth">
+      <span class="brand-mark">✳</span>
+      <span><strong>MY PHOTOBOOTH</strong><small>THE MOMENT STUDIO</small></span>
+    </a>
+    <div class="top-actions">
+      <span class="live-pill"><i></i> BOOTH ONLINE</span>
+      <button class="admin-button" id="adminInfoBtn" type="button" title="Area admin">⌑ <span>ADMIN</span></button>
     </div>
+  </header>
 
-    <div id="counter" class="counter">Foto: 0 / 1</div>
-
-    <div class="button-grid">
-      <button id="cameraBtn" class="button secondary">
-        Aktifkan Kamera
-      </button>
-      <button id="captureBtn" class="button primary" disabled>
-        Ambil Foto
-      </button>
-    </div>
-
-    <div class="preview">
-      <h3>Hasil Photobooth</h3>
-      <canvas id="result"></canvas>
-    </div>
-
-    <div class="button-grid">
-      <button id="resetBtn" class="button secondary">
-        Ulangi
-      </button>
-      <button id="downloadBtn" class="button primary" disabled>
-        Download
-      </button>
-    </div>
-
-    <button id="uploadBtn" class="button green" disabled>
-      Upload ke Google Drive
-    </button>
-
-    <p id="status" class="status">
-      Silakan aktifkan kamera.
-    </p>
-
-    <section id="qrPanel" class="qr-panel" hidden>
-      <h3>Foto berhasil disimpan!</h3>
-      <p>Scan QR Code untuk melihat foto.</p>
-      <div id="qrcode"></div>
-      <p id="fileName" class="file-name"></p>
-      <a id="driveLink" class="button green"
-         target="_blank" rel="noopener">
-        Buka Foto
-      </a>
+  <main class="page-shell">
+    <section class="intro-grid">
+      <div class="intro-copy">
+        <span class="eyebrow">YOUR MOMENT, BEAUTIFULLY FRAMED</span>
+        <h1>Let's take<br><em>a photo.</em></h1>
+        <p>Abadikan momen terbaikmu. Pilih desain frame dan jumlah foto, lalu mulai sesi photobooth.</p>
+        <a class="jump-button" href="#studio"><span>◎</span> MULAI PHOTOBOOTH <b>↗</b></a>
+        <div class="intro-note">✦ &nbsp; Siapkan pose terbaikmu — sesi hanya membutuhkan beberapa detik.</div>
+      </div>
+      <div class="sample-art" aria-label="Contoh hasil photobooth">
+        <div class="sample-strip sample-strip-one">
+          <div class="sample-photo sample-photo-a">✦</div>
+          <div class="sample-photo sample-photo-b">✧</div>
+          <div class="sample-photo sample-photo-c">❋</div>
+          <strong>MY PHOTOBOOTH</strong><small>CAPTURE THE MOMENT</small>
+        </div>
+        <div class="sample-strip sample-strip-two">
+          <div class="sample-photo sample-photo-d">✧</div>
+          <div class="sample-photo sample-photo-e">✦</div>
+          <strong>GOOD TIMES</strong><small>EST. 2026</small>
+        </div>
+        <span class="art-caption">YOUR MEMORY · YOUR STYLE</span>
+      </div>
     </section>
 
-  </section>
-</main>
+    <section class="studio-card" id="studio">
+      <div class="section-heading">
+        <div><span class="step-label">STEP 01</span><h2>Pilih desain frame</h2><p>Tentukan tampilan foto yang paling kamu suka.</p></div>
+        <span class="step-count">01 / 03</span>
+      </div>
+      <div class="frame-options" role="group" aria-label="Pilihan frame">
+        <button class="frame-option is-selected" data-frame="classic" type="button" aria-pressed="true">
+          <span class="frame-preview classic-preview"><i></i><i></i><i></i><b>MY PHOTO</b></span>
+          <span class="option-title">01 · Classic Cream</span><small>Warna hangat dengan sentuhan elegan.</small>
+          <span class="selected-mark">✓</span>
+        </button>
+        <button class="frame-option" data-frame="minimal" type="button" aria-pressed="false">
+          <span class="frame-preview minimal-preview"><i></i><i></i><i></i><b>MEMORIES</b></span>
+          <span class="option-title">02 · Modern Minimal</span><small>Bersih, simpel, dan modern.</small>
+          <span class="selected-mark">✓</span>
+        </button>
+        <button class="frame-option" data-frame="gold" type="button" aria-pressed="false">
+          <span class="frame-preview gold-preview"><i></i><i></i><i></i><b>GOLD EDITION</b></span>
+          <span class="option-title">03 · Gold Noir</span><small>Hitam elegan dengan aksen emas.</small>
+          <span class="selected-mark">✓</span>
+        </button>
+      </div>
 
-<footer>
-  MY PHOTOBOOTH · Version 1.0
-</footer>
+      <div class="section-heading layout-heading">
+        <div><span class="step-label">STEP 02</span><h2>Pilih jumlah foto</h2><p>Pilih komposisi foto dalam satu hasil.</p></div>
+        <span class="step-count">02 / 03</span>
+      </div>
+      <div class="layout-options" role="group" aria-label="Jumlah foto">
+        <button class="layout-option" data-mode="1" type="button" aria-pressed="false"><span class="layout-icon layout-one"><i></i></span><span><b>Single Photo</b><small>1 foto · Portrait</small></span></button>
+        <button class="layout-option is-selected" data-mode="3" type="button" aria-pressed="true"><span class="layout-icon layout-three"><i></i><i></i><i></i></span><span><b>Photo Strip 3</b><small>3 foto · Vertical strip</small></span><span class="popular">POPULER</span></button>
+        <button class="layout-option" data-mode="4" type="button" aria-pressed="false"><span class="layout-icon layout-four"><i></i><i></i><i></i><i></i></span><span><b>Photo Grid 4</b><small>4 foto · Classic grid</small></span></button>
+      </div>
+      <div class="selection-summary"><span>DESAIN PILIHAN</span><strong id="selectionSummary">Classic Cream · Photo Strip 3</strong></div>
+      <button class="primary-button" id="startCameraBtn" type="button">LANJUT KE KAMERA <span>→</span></button>
+    </section>
 
-<script src="app.js"></script>
+    <section class="camera-card" id="cameraSection">
+      <div class="section-heading">
+        <div><span class="step-label">STEP 03</span><h2>Studio kamera</h2><p>Posisikan dirimu di tengah layar, lalu ambil foto.</p></div>
+        <span class="step-count">03 / 03</span>
+      </div>
+      <div class="camera-layout">
+        <div class="camera-column">
+          <div class="camera-stage">
+            <video id="video" autoplay muted playsinline></video>
+            <div class="camera-placeholder" id="cameraPlaceholder"><span>◎</span><b>Kamera belum aktif</b><small>Tekan tombol aktifkan kamera untuk memulai.</small></div>
+            <span class="camera-live-label"><i></i> LIVE PREVIEW</span>
+          </div>
+          <div class="camera-controls">
+            <button class="secondary-button" id="cameraBtn" type="button">Aktifkan Kamera</button>
+            <button class="primary-button shutter-button" id="captureBtn" type="button" disabled><span>◎</span> AMBIL FOTO <small id="counter">0 / 3</small></button>
+          </div>
+          <button class="text-button" id="resetBtn" type="button">↻ Ulangi sesi</button>
+        </div>
+        <div class="result-column">
+          <div class="result-heading"><div><b>Hasil foto</b><small>Pratinjau hasil komposisi</small></div><span class="result-tag">PREVIEW</span></div>
+          <div class="result-frame"><canvas id="result"></canvas><div class="result-empty" id="resultPlaceholder">Hasil fotomu akan muncul di sini.</div></div>
+          <div class="result-actions">
+            <button class="secondary-button" id="downloadBtn" type="button" disabled>↓ Download</button>
+            <button class="primary-button" id="uploadBtn" type="button" disabled>Upload & Buat QR</button>
+          </div>
+          <p id="status" class="status-message" role="status">Silakan pilih desain, lalu aktifkan kamera.</p>
+          <section id="qrPanel" class="qr-panel" hidden>
+            <div class="qr-success">✓ Foto berhasil disimpan</div>
+            <p>Scan QR Code untuk membuka dan mengunduh foto.</p>
+            <div id="qrcode"></div>
+            <small id="fileName"></small>
+            <a id="driveLink" target="_blank" rel="noopener">Buka foto di Google Drive ↗</a>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="attendant-note"><span>✦</span><div><b>Butuh bantuan?</b><small>Jika kamera atau proses foto mengalami kendala, silakan hubungi petugas booth.</small></div></section>
+  </main>
+  <footer><span>MY PHOTOBOOTH</span><span>MAKE MEMORIES THAT LAST · 2026</span></footer>
+  <script src="app.js"></script>
 </body>
 </html>
