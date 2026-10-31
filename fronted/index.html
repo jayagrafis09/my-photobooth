@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171717">
+  <title>MY PHOTOBOOTH</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <h1>MY PHOTOBOOTH</h1>
+  <p>Capture your best moments</p>
+</header>
+
+<main class="container">
+  <section class="panel">
+
+    <label for="mode">Pilih Mode Photobooth</label>
+    <select id="mode">
+      <option value="1">Single Photo</option>
+      <option value="3">Photo Strip 3</option>
+      <option value="4">Photo Strip 4</option>
+    </select>
+
+    <div class="camera-box">
+      <video id="video" autoplay muted playsinline></video>
+      <div id="cameraPlaceholder">Kamera belum aktif</div>
+    </div>
+
+    <div id="counter" class="counter">Foto: 0 / 1</div>
+
+    <div class="button-grid">
+      <button id="cameraBtn" class="button secondary">
+        Aktifkan Kamera
+      </button>
+      <button id="captureBtn" class="button primary" disabled>
+        Ambil Foto
+      </button>
+    </div>
+
+    <div class="preview">
+      <h3>Hasil Photobooth</h3>
+      <canvas id="result"></canvas>
+    </div>
+
+    <div class="button-grid">
+      <button id="resetBtn" class="button secondary">
+        Ulangi
+      </button>
+      <button id="downloadBtn" class="button primary" disabled>
+        Download
+      </button>
+    </div>
+
+    <button id="uploadBtn" class="button green" disabled>
+      Upload ke Google Drive
+    </button>
+
+    <p id="status" class="status">
+      Silakan aktifkan kamera.
+    </p>
+
+    <section id="qrPanel" class="qr-panel" hidden>
+      <h3>Foto berhasil disimpan!</h3>
+      <p>Scan QR Code untuk melihat foto.</p>
+      <div id="qrcode"></div>
+      <p id="fileName" class="file-name"></p>
+      <a id="driveLink" class="button green"
+         target="_blank" rel="noopener">
+        Buka Foto
+      </a>
+    </section>
+
+  </section>
+</main>
+
+<footer>
+  MY PHOTOBOOTH · Version 1.0
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
