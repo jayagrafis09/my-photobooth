@@ -118,6 +118,32 @@ frameButtons.forEach(btn=>btn.addEventListener("click",()=>selectFrame(btn.datas
 cameraBtn.addEventListener("click",startCamera);captureBtn.addEventListener("click",capturePhoto);
 resetBtn.addEventListener("click",resetPhotos);downloadBtn.addEventListener("click",downloadPhoto);uploadBtn.addEventListener("click",uploadPhoto);
 startCameraBtn.addEventListener("click",()=>{document.getElementById("cameraSection").scrollIntoView({behavior:"smooth"});if(!stream)startCamera();});
-document.getElementById("adminInfoBtn").addEventListener("click",()=>status("Area admin belum diaktifkan. Login dan pengelolaan admin akan diintegrasikan setelah backend admin tersedia."));
+const adminModal=document.getElementById("adminModal");
+const adminPin=document.getElementById("adminPin");
+const adminLoginForm=document.getElementById("adminLoginForm");
+const adminLoginBtn=document.getElementById("adminLoginBtn");
+const adminLoginStatus=document.getElementById("adminLoginStatus");
+function closeAdminModal(){adminModal.hidden=true;adminLoginStatus.textContent="";adminPin.value="";}
+document.getElementById("adminInfoBtn").addEventListener("click",()=>{adminModal.hidden=false;adminPin.focus();});
+document.getElementById("adminCloseBtn").addEventListener("click",closeAdminModal);
+adminModal.addEventListener("click",event=>{if(event.target===adminModal)closeAdminModal();});
+adminLoginForm.addEventListener("submit",async event=>{
+  event.preventDefault();
+  const pin=adminPin.value.trim();
+  if(!pin){adminLoginStatus.textContent="PIN wajib diisi.";return;}
+  adminLoginBtn.disabled=true;adminLoginStatus.textContent="Memeriksa PIN...";
+  try{
+    const response=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin})});
+    const result=await response.json();
+    if(!response.ok||!result.success)throw new Error(result.message||"Login admin gagal.");
+    adminLoginStatus.textContent="PIN benar. Login berhasil. Area pengelolaan akan dibuka pada tahap berikutnya.";
+    adminLoginStatus.classList.add("is-success");
+    adminPin.value="";
+  }catch(error){
+    adminLoginStatus.textContent=error.message;
+    adminLoginStatus.classList.remove("is-success");
+  }finally{adminLoginBtn.disabled=false;}
+});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!adminModal.hidden)closeAdminModal();});
 window.addEventListener("beforeunload",()=>{if(stream)stream.getTracks().forEach(track=>track.stop());});
 selectMode(3);selectFrame("classic");updateCounter();
